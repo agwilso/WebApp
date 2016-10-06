@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet Layers Control Example</title>
+	<meta charset="utf-8" />
+	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+	
+	<!-- Load Leaflet from CDN-->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/leaflet/1.0.0-rc.3/leaflet.css" />
+	<script src="https://cdn.jsdelivr.net/leaflet/1.0.0-rc.3/leaflet-src.js"></script>
+
+	<!-- Load Esri Leaflet from CDN -->
+	<script src="https://cdn.jsdelivr.net/leaflet.esri/2.0.2/esri-leaflet.js"></script>
+
+	<!-- Load Esri Leaflet Renderers (http://esri.github.io/esri-leaflet/examples/renderers-plugin.html, https://www.npmjs.com/package/esri-leaflet-renderers) -->
+	<script src="https://cdn.jsdelivr.net/leaflet.esri.renderers/2.0.2/esri-leaflet-renderers.js"></script>
+	
+	<!--Leaflet layer control (http://leafletjs.com/examples/layers-control-example.html) -->
+	<link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.3/dist/leaflet.css" />
+		
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">	
+	
+	<!-- Load fullPage.js from CDN - source(http://webdesign.tutsplus.com/articles/vertical-and-horizontal-scrolling-with-fullpagejs--cms-24215)-->
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.6.6/jquery.fullPage.css" rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.6.6/jquery.fullPage.min.js"></script>
+</head>
+
+<body>
+	<header>
+	<div class="jumbotron"></div>
+	</div>
+	
+	</header>
+	<div id="map" style="width: 100%; height: 410px"></div>
+	
+	<style type="text/css">
+		.jumbotron
+		{
+			background: url('http://s9.postimg.org/apijxs7r3/EAtlas_Banner3.png') no-repeat center center;
+				 -webkit-background-size: 100% 100%;
+				 -moz-background-size: 100% 100%;
+				 -o-background-size: 100% 100%;
+				 background-size: 100% 100%;
+			min-height:230px;
+		}
+	</style>
+
+	<!-- Full screen button on map (https://www.mapbox.com/mapbox.js/example/v1.0.0/leaflet-fullscreen/ or http://leaflet.github.io/Leaflet.fullscreen/) -->
+	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+	<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+	
+	<script>
+		var cities = new L.LayerGroup();
+		L.marker([30.2672, -97.7431]).bindPopup('Austin, TX').addTo(cities),
+		L.marker([43.0389, -87.9065]).bindPopup('Milwaukee, WI').addTo(cities),
+		L.marker([40.7128, -74.0059]).bindPopup('New York, NY').addTo(cities),
+		L.marker([33.4484, -112.0740]).bindPopup('Phoenix, AZ').addTo(cities),
+		L.marker([45.5231, -122.6765]).bindPopup('Portland, OR').addTo(cities),
+		L.marker([27.9506, -82.4572]).bindPopup('Tampa, FL').addTo(cities);
+		
+		var AcuteResp = new L.LayerGroup();
+		//Austin, TX
+		L.esri.featureLayer({
+		url: 'https://enviroatlas.epa.gov/arcgis/rest/services/Communities/ESC_ATX_CleanAir/MapServer/20'
+		}).addTo(AcuteResp),
+		//Milwaukee, WI
+		L.esri.featureLayer({
+		url: 'https://enviroatlas.epa.gov/arcgis/rest/services/Communities/ESC_MWI_CleanAir/MapServer/20'
+		}).addTo(AcuteResp),
+		//New York, NYC
+		L.esri.featureLayer({
+		url: 'https://enviroatlas.epa.gov/arcgis/rest/services/Communities/ESC_NYNY_CleanAir/MapServer/20'
+		}).addTo(AcuteResp),
+		//Phoenix, AZ
+		L.esri.featureLayer({
+		url: 'https://enviroatlas.epa.gov/arcgis/rest/services/Communities/ESC_PAZ_CleanAir/MapServer/20'
+		}).addTo(AcuteResp),
+		//Portland, OR
+		L.esri.featureLayer({
+		url: 'https://enviroatlas.epa.gov/arcgis/rest/services/Communities/ESC_POR_CleanAir/MapServer/20'
+		}).addTo(AcuteResp),
+		//Tampa, FL
+		L.esri.featureLayer({
+		url: 'https://enviroatlas.epa.gov/arcgis/rest/services/Communities/ESC_TFL_CleanAir/MapServer/20'
+		}).addTo(AcuteResp);
+		
+		var PercentTotalPopulation = new L.LayerGroup();
+		//Austin, TX
+		L.esri.featureLayer({
+		url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_ATX_demographics/MapServer/0'
+		})
+		.addTo(PercentTotalPopulation),
+		//Milwaukee, WI
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_MWI_demographics/MapServer/0'
+		}).addTo(PercentTotalPopulation),
+		//New York, NYC
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_NYNY_demographics/MapServer/0'
+		}).addTo(PercentTotalPopulation),
+		//Phoenix, AZ
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_PAZ_demographics/MapServer/0'
+		}).addTo(PercentTotalPopulation),
+		//Portland, OR
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_POR_demographics/MapServer/0'
+		}).addTo(PercentTotalPopulation),
+		//Tampa, FL
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_TFL_demographics/MapServer/0'
+		}).addTo(PercentTotalPopulation);
+		
+		var PercentLTone = new L.LayerGroup();
+		//Austin, TX
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_ATX_demographics/MapServer/2'
+		}).addTo(PercentLTone),
+		//Milwaukee, WI
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_MWI_demographics/MapServer/2'
+		}).addTo(PercentLTone),
+		//New York, NYC
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_NYNY_demographics/MapServer/2'
+		}).addTo(PercentLTone),
+		//Phoenix, AZ
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_PAZ_demographics/MapServer/2'
+		}).addTo(PercentLTone),
+		//Portland, OR
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_POR_demographics/MapServer/2'
+		}).addTo(PercentLTone),
+		//Tampa, FL
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_TFL_demographics/MapServer/2'
+		}).addTo(PercentLTone);
+		
+		var PercentPopOtherWhite = new L.LayerGroup();
+		//Austin, TX
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_ATX_demographics/MapServer/8'
+		}).addTo(PercentPopOtherWhite),
+		//Milwaukee, WI
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_MWI_demographics/MapServer/8'
+		}).addTo(PercentPopOtherWhite),
+		//New York, NYC
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_NYNY_demographics/MapServer/8'
+		}).addTo(PercentPopOtherWhite),
+		//Phoenix, AZ
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_PAZ_demographics/MapServer/8'
+		}).addTo(PercentPopOtherWhite),
+		//Portland, OR
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_POR_demographics/MapServer/8'
+		}).addTo(PercentPopOtherWhite),
+		//Tampa, FL
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_TFL_demographics/MapServer/8'
+		}).addTo(PercentPopOtherWhite);
+		
+		var PercentBelowtwicPL = new L.LayerGroup();
+		//Austin, TX
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_ATX_demographics/MapServer/10'
+		}).addTo(PercentBelowtwicPL),
+		//Milwaukee, WI
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_MWI_demographics/MapServer/10'
+		}).addTo(PercentBelowtwicPL),
+		//New York, NYC
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_NYNY_demographics/MapServer/10'
+		}).addTo(PercentBelowtwicPL),
+		//Phoenix, AZ
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_PAZ_demographics/MapServer/10'
+		}).addTo(PercentBelowtwicPL),
+		//Portland, OR
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_POR_demographics/MapServer/10'
+		}).addTo(PercentBelowtwicPL),
+		//Tampa, FL
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/PeopleBuiltSpaces/ESC_TFL_demographics/MapServer/10'
+		}).addTo(PercentBelowtwicPL);
+		
+		var PTTreecover = new L.LayerGroup();
+		//Austin, TX
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/Communities/ESC_ATX_CleanAir/MapServer/2'
+		}).addTo(PTTreecover),
+		//Milwaukee, WI
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/Communities/ESC_MWI_CleanAir/MapServer/2'
+		}).addTo(PTTreecover),
+		//New York, NYC
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/Communities/ESC_NYNY_CleanAir/MapServer/2'
+		}).addTo(PTTreecover),
+		//Phoenix, AZ
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/Communities/ESC_PAZ_CleanAir/MapServer/2'
+		}).addTo(PTTreecover),
+		//Portland, OR
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/Communities/ESC_POR_CleanAir/MapServer/2'
+		}).addTo(PTTreecover),
+		//Tampa, FL
+		L.esri.featureLayer({
+			url: 'https://enviroatlas.epa.gov/arcgis/rest/services/Communities/ESC_TFL_CleanAir/MapServer/2'
+		}).addTo(PTTreecover);
+		
+		var mbAttr = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+				'Image © <a href="http://mapbox.com">Mapbox</a>',
+			mbUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw';
+
+	    var grayscale   = L.tileLayer(mbUrl, {id: 'mapbox.light', attribution: mbAttr}),
+		    streets  = L.tileLayer(mbUrl, {id: 'mapbox.streets',   attribution: mbAttr});
+
+		var map = L.map('map', {
+			center: [37.0902, -95.7129],
+			zoom: 4,
+			layers: [grayscale, cities]});  
+			
+		var baseLayers = {};
+
+		var overlays = {
+			"Cities": cities,
+			"Percent Tree Cover": PTTreecover,
+			"Acute Respiratory Symptoms Avoided Due to Ozone Removed": AcuteResp,
+			"Percent Total Population": PercentTotalPopulation,
+			"Percent Population other than White, Non-Hispanic": PercentPopOtherWhite,
+			"Percent Population with Income Below Twice the Poverty Level": PercentBelowtwicPL,
+			"Percent Population under One Year Old": PercentLTone};
+			
+		L.control.layers(baseLayers, overlays).addTo(map);	
+		L.control.fullscreen().addTo(map);
+		L.esri.Controls.legend([dynamicLayer, featureLayer], {position: 'topright'}).addTo(map);		
+	</script>
+	
+	 <style>
+	#basemaps-wrapper {
+    position: absolute;
+    top: 269px;
+    right: 50px;
+    z-index: 400;
+    background: white;
+    padding: 10px;
+	}
+	#basemaps {
+    margin-bottom: 5px;
+	}
+	</style>
+
+	<div id="basemaps-wrapper" class="leaflet-bar">
+	<select name="basemaps" id="basemaps" onChange="changeBasemap(basemaps)">
+		<option value="Topographic">Topographic</option>
+		<option value="Streets">Streets</option>
+		<option value="Imagery">Imagery</option>
+		<option value="NationalGeographic">National Geographic</option>
+		<option value="Oceans">Oceans</option>
+		<option value="Gray">Gray</option>
+		<option value="DarkGray">Dark Gray</option>
+		<option value="ShadedRelief">Shaded Relief</option>
+	</select>
+	</div>
+
+	<script>	
+	var layer = L.esri.basemapLayer('Imagery').addTo(map);
+	var layerLabels;
+
+	function setBasemap(basemap) {
+		if (layer) {
+		map.removeLayer(layer);
+		}
+
+		layer = L.esri.basemapLayer(basemap);
+		map.addLayer(layer);
+
+		if (layerLabels) {
+		map.removeLayer(layerLabels);
+		}
+
+		if (basemap === 'ShadedRelief'
+		|| basemap === 'Oceans'
+		|| basemap === 'Gray'
+		|| basemap === 'DarkGray'
+		|| basemap === 'Imagery'
+		|| basemap === 'Terrain'
+		|| basemap === 'esriImageryLabels'
+		) {
+      layerLabels = L.esri.basemapLayer(basemap + 'Labels');
+      map.addLayer(layerLabels);
+		}
+	}
+
+	function changeBasemap(basemaps){
+		var basemap = basemaps.value;
+		setBasemap(basemap);
+	}
+	</script>
+
+	<!-- Load Esri Leaflet Renderers (http://esri.github.io/esri-leaflet/examples/renderers-plugin.html, https://www.npmjs.com/package/esri-leaflet-renderers) -->
+	<script src="https://cdn.jsdelivr.net/leaflet.esri.renderers/2.0.2/esri-leaflet-renderers.js"></script>
+
+	<header>
+		<div class="well">
+			<div class="container">
+				<h2 { text-align: center }>Interact with the Map Above! </h2>
+					<p style="font-color:red; padding-left:15px;">You may interact with this map and its layers in several 
+					different ways. 
+				 <br> 
+				 •	First, select an EnviroAtlas community from the list below. 
+				 <br> 
+				 •	Next, click on the down arrow of the dropdown menu (at the top right corner of the map) menu to select a 
+				 baselayer. 
+				 <br> 
+				 •	Then, select EnviroAtlas's "Percent Tree Cover" map to view the distribution of trees across the tagret 
+				 community. Tree cover provides many benefits such as ozone removal (the focus of this web app), air 
+				 and water filtration, water and carbon storage, natural hazard mitigation, and appealing settings that 
+				 encourage people to spend time outdoors. Please wait a moment for the map layer to load. In the interim, you can
+				 view the factsheet for this layer <a href="https://enviroatlas.epa.gov/enviroatlas/DataFactSheets/pdf/ESC/PercentTreeCover.pdf">
+				 here.</a>
+				 <br>
+				 • Afterward, select the "Acute Respirtatory Symptoms Avoided Due to Ozone Removed by Tree Cover" map layer using 
+				 the layer control located next to the baselayer dropdown menu. Please wait a moment for the map layer to load.
+				 In the interim, you can view the factsheet for this layer <a href="https://enviroatlas.epa.gov/enviroatlas/datafactsheets/pdf/ESC/AcuteRespiratorySymptomsAvoidedDuetoOzoneRemoved.pdf">
+				 here.</a> 
+				 <br> 
+				 • Finally, overlay a 2010 US Census Bureau layer--using the layer control next to the baselayer dropdown--to 
+				 visually inspect the geographical distribution of the chosen demographic group across the Acute Respirtatory 
+				 Symptoms Avoided due to Ozone Removed by Tree Cover map layer. Please wait a moment for the  map layer to load. 
+				 <br>
+				 * You may switch to full-screen or zoom into a location of interest using the controls on the left side of the 
+				 map.</p>
+				<h4 { text-align: center }> After interacting with this web app, <a href="https://enviroatlas.epa.gov/enviroatlas/InteractiveMapEntrance/InteractiveMap/index.html">
+					click here</a> to view the full suite of ecosystem service layers in the EnviroAtlas interactive map,</h4>	
+	</header>
+
+			<div class="container">
+				<div class="row">
+					<div class="well">				
+			<!-- Load buttons for pan (http://jsfiddle.net/nathansnider/4v2L0uze/) -->
+				<div class="btn-group btn-group-justified">
+					<a href="#" class="btn btn-primary" onclick="AustinTX()">Austin, TX</a>
+					<a href="#" class="btn btn-primary" onclick="MilwaukeeWI()">Milwaukee, WI</a>
+					<a href="#" class="btn btn-primary" onclick="NewYorkNY()">New York, NY</a>
+					<a href="#" class="btn btn-primary" onclick="PhoenixAZ()">Phoenix, AZ</a>
+					<a href="#" class="btn btn-primary" onclick="PortlandOR()">Portland, OR</a>
+					<a href="#" class="btn btn-primary" onclick="TampaFL()">Tampa, FL</a>
+				</div></div>
+					
+				<div class="btn-group btn-group-justified">
+					<a href="#" class="btn btn-danger" onclick="StopPan()">Stop Panning</a>
+					<a href="" class="btn btn-success btn-block">Resest to Full US View</a>
+				</div>
+			<!-- Viz Insert -->		
+		
+		<script>
+					AustinTX = function () {
+						map.setView([30.2672, -97.7431], 10, {
+						"pan": {
+							"animate": false,
+								"duration": 6
+								}
+							});
+						}
+					MilwaukeeWI = function () {
+						map.setView([43.0389, -87.9065], 9, {
+						"pan": {
+							"animate": false,
+								"duration": 6
+								}
+							});
+						}
+					NewYorkNY = function () {
+						map.setView([40.7128, -74.0059], 10, {
+						"pan": {
+							"animate": false,
+								"duration": 6
+								}
+							});
+						}
+					PhoenixAZ = function () {
+						map.setView([33.4484, -112.0740], 10, {
+						"pan": {
+							"animate": false,
+								"duration": 6
+								}
+							});
+						}
+					PortlandOR = function () {
+						map.setView([45.5231, -122.6765], 10, {
+						"pan": {
+							"animate": false,
+								"duration": 6
+								}
+							});
+						}
+					TampaFL = function () {
+						map.setView([27.9506, -82.4572], 9.8, {
+						"pan": {
+							"animate": false,
+								"duration": 6
+								}
+							});
+						}
+					StopPan = function () {
+						map.setView(map.getCenter(), map.getZoom(), {
+							"animate": false
+						});
+					}
+					</script>
+					
+<h2 style="padding-top:30px;" class="gdl-page-title gdl-divider">Interact with EnviroAtlas Data Below! Visualizations: 
+Phoenix, Arizona & Tampa, Florida</h2>
+<div class="col-md-6">
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+               <iframe src='https://usepa-my.sharepoint.com/personal/wilson_anthony_epa_gov/_layouts/15/WopiFrame.aspx?sourcedoc={628039c7-c6bd-4f1d-850b-45f8e8860121}&action=embedview&wdAr=1.7773851590106007' width='510px' height='267px' frameborder='0'>This is an embedded <a target='_blank' href='https://office.com'>Microsoft Office</a> presentation, powered by <a target='_blank' href='https://office.com/webapps'>Office Online</a>.</iframe>
+                </div>
+<div class="col-md-5">
+<p class="paragraphtop">The information in this section gives an overview of acute respiratory symptoms avoided due to ozone 
+removed by tree cover in Phoenix, Arizona (2010) and Tampa, Florida (2010).</p>
+<p style="font-color:red; padding-left:0px;">You may interact with the visualizations below by clicking or 
+hovering over a bubble or block group in the map in order to draw deeper inferences about how different populations may be 
+affected by ozone removed by tree cover. The size of each bubble represents the percent of acute
+respiratory symptoms avoided (within each community or block group) due to ozone removed by tree cover across the entire 
+community. Please note that block groups with high percent tree cover may not have a large population. </p>
+<p style="padding-left:0px;">Alternatively, explore the tutorial on the left for a step by step guide on using the 
+visualizations below. </p>
+<p style="padding-left:0px;">After you finish with the visualizations below, please <a href="https://www.epa.gov/enviroatlas/enviroatlas-eco-health-relationship-browser">click here</a> 
+or view the final tab of the visualization to explore EnviroAtlas's Eco-Health Relationship Browser to see the science supporting
+ ecosystem services, especially tree cover removal of Ozone! </p>
+<p style="padding-left:0px;">The baseline data for this visualization were created by Neal Fan and various members of the 
+EnviroAtlas Team. The contents of this page and WebApp were created by Anthony Wilson.</p>
+</p></div>
+			<!-- Above just youtube clip and text -->	
+
+<div class="container">
+				<div class="row">
+					<div class="well">
+						
+
+<div class="clearfix"></div>
+<div class="desktop">
+<div class='tableauPlaceholder' id='viz1475091633018' style='position: relative'><noscript><a href='#'><img alt=' ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Si&#47;SixCommBubble&#47;BubbleChartbyCommunity&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='site_root' value='' /><param name='name' value='SixCommBubble&#47;BubbleChartbyCommunity' /><param name='tabs' value='yes' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Si&#47;SixCommBubble&#47;BubbleChartbyCommunity&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1475091633018');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+</div></div></div></div>
+
+
+			
+			<!-- Viz Insert -->	
+
+			<p><small><a href="https://www.facebook.com/geographyeducation/posts/505647889565570">Like us</a> on facebook</small>
+			<small><a href="https://twitter.com/hashtag/enviroatlas">Ask us </a> on Twitter</small>
+			<small><a href="https://www.youtube.com/watch?v=ZMU8ZLsCmUM">Subscribe to us</a> on Youtube</small>
+				
+			</p>
+		</div> <!-- end container -->
+	</footer>
+		
+	<!-- Latest compiled and minified JavaScript -->
+
+	<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+</body>
+</html>
